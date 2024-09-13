@@ -2,15 +2,20 @@ package diegobasili.gestioneViaggiAziendali.controllers;
 
 import diegobasili.gestioneViaggiAziendali.entities.Dipendente;
 import diegobasili.gestioneViaggiAziendali.entities.Viaggio;
+import diegobasili.gestioneViaggiAziendali.exceptions.BadRequestException;
 import diegobasili.gestioneViaggiAziendali.payloads.DipendenteDTO;
 import diegobasili.gestioneViaggiAziendali.payloads.ViaggioDTO;
 import diegobasili.gestioneViaggiAziendali.services.ViaggiService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/viaggi")
@@ -27,8 +32,15 @@ public class ViaggiController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Viaggio save(@RequestBody ViaggioDTO body){
-        return this.viaggiService.saveViaggio(body);
+    public Viaggio save(@RequestBody @Validated ViaggioDTO body, BindingResult validationResult){
+        if (validationResult.hasErrors()) {
+            String messages = validationResult.getAllErrors().stream()
+                    .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                    .collect(Collectors.joining(". "));
+            throw new BadRequestException("Ci sono stati errori nel payload. " + messages);
+        } else {
+            return this.viaggiService.saveViaggio(body);
+        }
     }
 
     @GetMapping("/{viaggioId}")
@@ -37,8 +49,15 @@ public class ViaggiController {
     }
 
     @PutMapping("/{viaggioId}")
-    public Viaggio findByIdAndUpdate(@PathVariable UUID viaggioId, @RequestBody ViaggioDTO body){
-        return this.viaggiService.findByIdAndUpdate(viaggioId, body);
+    public Viaggio findByIdAndUpdate(@PathVariable UUID viaggioId, @RequestBody @Validated ViaggioDTO body, BindingResult validationResult){
+        if (validationResult.hasErrors()) {
+            String messages = validationResult.getAllErrors().stream()
+                    .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                    .collect(Collectors.joining(". "));
+            throw new BadRequestException("Ci sono stati errori nel payload. " + messages);
+        } else {
+            return this.viaggiService.findByIdAndUpdate(viaggioId, body);
+        }
     }
 
     @DeleteMapping("/{viaggioId}")
