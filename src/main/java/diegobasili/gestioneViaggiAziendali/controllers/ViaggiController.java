@@ -1,9 +1,49 @@
 package diegobasili.gestioneViaggiAziendali.controllers;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import diegobasili.gestioneViaggiAziendali.entities.Dipendente;
+import diegobasili.gestioneViaggiAziendali.entities.Viaggio;
+import diegobasili.gestioneViaggiAziendali.payloads.DipendenteDTO;
+import diegobasili.gestioneViaggiAziendali.payloads.ViaggioDTO;
+import diegobasili.gestioneViaggiAziendali.services.ViaggiService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/viaggi")
 public class ViaggiController {
+    @Autowired
+    private ViaggiService viaggiService;
+
+    @GetMapping
+    public Page<Viaggio> findAll(@RequestParam(defaultValue = "0") int page,
+                                 @RequestParam(defaultValue = "10") int size,
+                                 @RequestParam(defaultValue = "id") String sortBy){
+        return this.viaggiService.findAll(page, size, sortBy);
+    }
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public Viaggio save(@RequestBody ViaggioDTO body){
+        return this.viaggiService.saveViaggio(body);
+    }
+
+    @GetMapping("/{viaggioId}")
+    public Viaggio findById(@PathVariable UUID viaggioId){
+        return this.viaggiService.findById(viaggioId);
+    }
+
+    @PutMapping("/{viaggioId}")
+    public Viaggio findByIdAndUpdate(@PathVariable UUID viaggioId, @RequestBody ViaggioDTO body){
+        return this.viaggiService.findByIdAndUpdate(viaggioId, body);
+    }
+
+    @DeleteMapping("/{viaggioId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void findByIdAndDelete(@PathVariable UUID viaggioId){
+        this.viaggiService.findByIdAndDelete(viaggioId);
+    }
 }
