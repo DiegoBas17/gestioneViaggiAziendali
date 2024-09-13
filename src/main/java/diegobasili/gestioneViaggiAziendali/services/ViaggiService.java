@@ -30,8 +30,8 @@ public class ViaggiService {
     public Viaggio saveViaggio(ViaggioDTO body) {
         StatoViaggio statoViaggio;
         try {
-            statoViaggio = StatoViaggio.valueOf(body.statoViaggio().toUpperCase()); // Converte anche in maiuscolo per evitare problemi
-        } catch (IllegalArgumentException e) {
+            statoViaggio = StatoViaggio.valueOf(body.statoViaggio().toUpperCase());
+        } catch (Exception e) {
             throw new BadRequestException("Stato del viaggio non valido: " + body.statoViaggio() + " il valore inserito deve essere: IN_PROGRAMMA o COMPLETATO!");
         }
         Viaggio viaggio =  new Viaggio(body.destinazione(), body.data(), statoViaggio);
@@ -45,7 +45,7 @@ public class ViaggiService {
     public Viaggio findByIdAndUpdate(UUID viaggioId, ViaggioDTO updateBody) {
         StatoViaggio statoViaggio;
         try {
-            statoViaggio = StatoViaggio.valueOf(updateBody.statoViaggio().toUpperCase()); // Converte anche in maiuscolo per evitare problemi
+            statoViaggio = StatoViaggio.valueOf(updateBody.statoViaggio().toUpperCase());
         } catch (IllegalArgumentException e) {
             throw new BadRequestException("Stato del viaggio non valido: " + updateBody.statoViaggio() + " il valore inserito deve essere: IN_PROGRAMMA o COMPLETATO!");
         }
