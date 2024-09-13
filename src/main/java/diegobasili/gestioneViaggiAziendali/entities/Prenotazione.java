@@ -27,4 +27,11 @@ public class Prenotazione {
     private Dipendente dipendente;
     @ManyToOne
     private Viaggio viaggio;
+
+    public Prenotazione(LocalDate data_richiesta, String note, Dipendente dipendente, Viaggio viaggio) {
+        this.data_richiesta = data_richiesta;
+        this.note = note;
+        this.dipendente = dipendente;
+        this.viaggio = viaggio;
+    }
 }
