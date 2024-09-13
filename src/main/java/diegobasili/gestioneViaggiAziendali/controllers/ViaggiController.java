@@ -5,6 +5,8 @@ import diegobasili.gestioneViaggiAziendali.entities.Viaggio;
 import diegobasili.gestioneViaggiAziendali.exceptions.BadRequestException;
 import diegobasili.gestioneViaggiAziendali.payloads.DipendenteDTO;
 import diegobasili.gestioneViaggiAziendali.payloads.ViaggioDTO;
+import diegobasili.gestioneViaggiAziendali.payloads.ViaggioRespDTO;
+import diegobasili.gestioneViaggiAziendali.payloads.ViaggioStatoDTO;
 import diegobasili.gestioneViaggiAziendali.services.ViaggiService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
@@ -32,14 +34,14 @@ public class ViaggiController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Viaggio save(@RequestBody @Validated ViaggioDTO body, BindingResult validationResult){
+    public ViaggioRespDTO save(@RequestBody @Validated ViaggioDTO body, BindingResult validationResult){
         if (validationResult.hasErrors()) {
             String messages = validationResult.getAllErrors().stream()
                     .map(DefaultMessageSourceResolvable::getDefaultMessage)
                     .collect(Collectors.joining(". "));
             throw new BadRequestException("Ci sono stati errori nel payload. " + messages);
         } else {
-            return this.viaggiService.saveViaggio(body);
+            return new ViaggioRespDTO(this.viaggiService.saveViaggio(body).getId());
         }
     }
 
@@ -64,5 +66,10 @@ public class ViaggiController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void findByIdAndDelete(@PathVariable UUID viaggioId){
         this.viaggiService.findByIdAndDelete(viaggioId);
+    }
+
+    @PatchMapping("/{viaggioId}")
+    public Viaggio changeStatoViaggio (@PathVariable UUID viaggioId, @RequestBody @Validated ViaggioStatoDTO body) {
+        return this.viaggiService.changeStatoViaggio(viaggioId,body);
     }
 }

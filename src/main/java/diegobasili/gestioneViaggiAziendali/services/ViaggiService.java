@@ -6,6 +6,7 @@ import diegobasili.gestioneViaggiAziendali.exceptions.BadRequestException;
 import diegobasili.gestioneViaggiAziendali.exceptions.NotFoundException;
 import diegobasili.gestioneViaggiAziendali.payloads.DipendenteDTO;
 import diegobasili.gestioneViaggiAziendali.payloads.ViaggioDTO;
+import diegobasili.gestioneViaggiAziendali.payloads.ViaggioStatoDTO;
 import diegobasili.gestioneViaggiAziendali.repositories.ViaggiRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -59,5 +60,18 @@ public class ViaggiService {
     public void findByIdAndDelete(UUID viaggioId) {
         Viaggio found = findById(viaggioId);
         this.viaggiRepository.delete(found);
+    }
+
+    public Viaggio changeStatoViaggio (UUID viaggioID, ViaggioStatoDTO viaggio) {
+        Viaggio viaggio1 = findById(viaggioID);
+        StatoViaggio statoViaggio;
+        try {
+            statoViaggio = StatoViaggio.valueOf(viaggio.statoViaggio().toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException("Stato del viaggio non valido: " + viaggio.statoViaggio() + " il valore inserito deve essere: IN_PROGRAMMA o COMPLETATO!");
+        }
+        viaggio1.setStato_viaggio(statoViaggio);
+        viaggiRepository.save(viaggio1);
+        return viaggio1;
     }
 }

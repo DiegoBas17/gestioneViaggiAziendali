@@ -3,6 +3,7 @@ package diegobasili.gestioneViaggiAziendali.controllers;
 import diegobasili.gestioneViaggiAziendali.entities.Dipendente;
 import diegobasili.gestioneViaggiAziendali.exceptions.BadRequestException;
 import diegobasili.gestioneViaggiAziendali.payloads.DipendenteDTO;
+import diegobasili.gestioneViaggiAziendali.payloads.DipendenteRespDTO;
 import diegobasili.gestioneViaggiAziendali.services.DipendentiService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
@@ -32,14 +33,14 @@ public class DipendentiController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Dipendente save(@RequestBody @Validated DipendenteDTO body, BindingResult validationResult) {
+    public DipendenteRespDTO save(@RequestBody @Validated DipendenteDTO body, BindingResult validationResult) {
         if (validationResult.hasErrors()) {
             String messages = validationResult.getAllErrors().stream()
                     .map(DefaultMessageSourceResolvable::getDefaultMessage)
                     .collect(Collectors.joining(". "));
             throw new BadRequestException("Ci sono stati errori nel payload. " + messages);
         } else {
-            return this.dipendentiService.saveDipendente(body);
+            return new DipendenteRespDTO (this.dipendentiService.saveDipendente(body).getId());
         }
     }
 
