@@ -3,6 +3,7 @@ package diegobasili.gestioneViaggiAziendali.controllers;
 import diegobasili.gestioneViaggiAziendali.entities.Prenotazione;
 import diegobasili.gestioneViaggiAziendali.exceptions.BadRequestException;
 import diegobasili.gestioneViaggiAziendali.payloads.PrenotazioneDTO;
+import diegobasili.gestioneViaggiAziendali.payloads.PrenotazioneRespDTO;
 import diegobasili.gestioneViaggiAziendali.services.PrenotazioniService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
@@ -29,14 +30,14 @@ private PrenotazioniService prenotazioniService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Prenotazione save(@RequestBody @Validated PrenotazioneDTO body, BindingResult validationResult){
+    public PrenotazioneRespDTO save(@RequestBody @Validated PrenotazioneDTO body, BindingResult validationResult){
         if (validationResult.hasErrors()) {
             String messages = validationResult.getAllErrors().stream()
                     .map(DefaultMessageSourceResolvable::getDefaultMessage)
                     .collect(Collectors.joining(". "));
             throw new BadRequestException("Ci sono stati errori nel payload. " + messages);
         } else {
-            return this.prenotazioniService.savePrenotazione(body);
+            return new PrenotazioneRespDTO(this.prenotazioniService.savePrenotazione(body).getId());
         }
     }
 

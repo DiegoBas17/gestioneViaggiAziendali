@@ -19,6 +19,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.UUID;
 
@@ -38,13 +39,31 @@ public class PrenotazioniService {
     }
 
     public Prenotazione savePrenotazione(PrenotazioneDTO body) {
-        Dipendente dipendente = dipendentiRepository.findById(body.dipendeteID()).orElseThrow(()-> new NotFoundException(body.dipendeteID()));
-        Viaggio viaggio = viaggiRepository.findById(body.viaggioId()).orElseThrow(()-> new NotFoundException(body.viaggioId()));
+        UUID dipendenteId;
+        UUID viaggioId;
+        try {
+            dipendenteId = UUID.fromString(body.dipendeteID());
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException("ID dipendente non valido: " + body.dipendeteID() + ". Deve essere un UUID valido.");
+        }
+        try {
+            viaggioId = UUID.fromString(body.viaggioId());
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException("ID viaggio non valido: " + body.viaggioId() + ". Deve essere un UUID valido.");
+        }
+        Dipendente dipendente = dipendentiRepository.findById(dipendenteId).orElseThrow(()-> new NotFoundException(dipendenteId));
+        Viaggio viaggio = viaggiRepository.findById(viaggioId).orElseThrow(()-> new NotFoundException(viaggioId));
         List<Prenotazione> listaPrenotazioni = prenotazioniRepository.findByDipendenteAndViaggioData(dipendente, viaggio.getData());
         if (!listaPrenotazioni.isEmpty()) {
             throw new BadRequestException("esiste gia una prenotazione in questa data: " + viaggio.getData() + " per questo dipendente: " + dipendente.getCognome());
         }
-        Prenotazione prenotazione = new Prenotazione(body.dataRichiesta(), body.note(), dipendente, viaggio);
+        LocalDate dataViaggio;
+        try {
+            dataViaggio = LocalDate.parse(body.dataRichiesta());
+        } catch (DateTimeParseException e) {
+            throw new BadRequestException("Formato della data non valido: " + body.dataRichiesta() + ", il formato deve essere yyyy-MM-dd!");
+        }
+        Prenotazione prenotazione = new Prenotazione(dataViaggio, body.note(), dipendente, viaggio);
         return this.prenotazioniRepository.save(prenotazione);
     }
 
@@ -53,13 +72,31 @@ public class PrenotazioniService {
     }
 
     public Prenotazione findByIdAndUpdate(UUID prenotazioneId, PrenotazioneDTO updateBody) {
-        Dipendente dipendente = dipendentiRepository.findById(updateBody.dipendeteID()).orElseThrow(()-> new NotFoundException(updateBody.dipendeteID()));
-        Viaggio viaggio = viaggiRepository.findById(updateBody.viaggioId()).orElseThrow(()-> new NotFoundException(updateBody.viaggioId()));
+        UUID dipendenteId;
+        UUID viaggioId;
+        try {
+            dipendenteId = UUID.fromString(updateBody.dipendeteID());
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException("ID dipendente non valido: " + updateBody.dipendeteID() + ". Deve essere un UUID valido.");
+        }
+        try {
+            viaggioId = UUID.fromString(updateBody.viaggioId());
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException("ID viaggio non valido: " + updateBody.viaggioId() + ". Deve essere un UUID valido.");
+        }
+        Dipendente dipendente = dipendentiRepository.findById(dipendenteId).orElseThrow(()-> new NotFoundException(dipendenteId));
+        Viaggio viaggio = viaggiRepository.findById(viaggioId).orElseThrow(()-> new NotFoundException(viaggioId));
+        LocalDate dataViaggio;
+        try {
+            dataViaggio = LocalDate.parse(updateBody.dataRichiesta());
+        } catch (DateTimeParseException e) {
+            throw new BadRequestException("Formato della data non valido: " + updateBody.dataRichiesta() + ", il formato deve essere yyyy-MM-dd!");
+        }
         Prenotazione found = findById(prenotazioneId);
         found.setNote(updateBody.note());
         found.setDipendente(dipendente);
         found.setViaggio(viaggio);
-        found.setData_richiesta(updateBody.dataRichiesta());
+        found.setData_richiesta(dataViaggio);
         return found;
     }
 

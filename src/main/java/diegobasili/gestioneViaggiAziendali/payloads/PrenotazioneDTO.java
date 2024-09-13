@@ -7,12 +7,13 @@ import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.UUID;
 
-public record PrenotazioneDTO(@NotNull
-                              LocalDate dataRichiesta,
+public record PrenotazioneDTO(@NotEmpty(message = "data obbligatorio!")
+                              @Size(min = 10, max = 10)
+                              String dataRichiesta,
                               @Size(min = 0, max = 250)
                               String note,
-                              @NotNull
-                              UUID dipendeteID,
-                              @NotNull
-                              UUID viaggioId) {
+                              @NotEmpty(message = "data obbligatorio!")
+                              String dipendeteID,
+                              @NotEmpty(message = "data obbligatorio!")
+                              String viaggioId) {
 }

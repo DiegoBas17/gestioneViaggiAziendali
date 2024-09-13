@@ -10,8 +10,9 @@ import java.time.LocalDate;
 public record ViaggioDTO(@NotEmpty(message = "destinazione obbligatorio!")
                          @Size(min = 3, max = 40)
                          String destinazione,
-                         @NotNull
-                         LocalDate data,
+                         @NotEmpty(message = "data obbligatorio!")
+                         @Size(min = 10, max = 10)
+                         String data,
                          @NotNull
                          String statoViaggio) {
 }

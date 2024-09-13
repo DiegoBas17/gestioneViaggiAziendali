@@ -15,6 +15,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.UUID;
 
 @Service
@@ -30,12 +32,18 @@ public class ViaggiService {
 
     public Viaggio saveViaggio(ViaggioDTO body) {
         StatoViaggio statoViaggio;
+        LocalDate dataViaggio;
         try {
             statoViaggio = StatoViaggio.valueOf(body.statoViaggio().toUpperCase());
         } catch (Exception e) {
             throw new BadRequestException("Stato del viaggio non valido: " + body.statoViaggio() + " il valore inserito deve essere: IN_PROGRAMMA o COMPLETATO!");
         }
-        Viaggio viaggio =  new Viaggio(body.destinazione(), body.data(), statoViaggio);
+        try {
+            dataViaggio = LocalDate.parse(body.data());
+        } catch (DateTimeParseException e) {
+            throw new BadRequestException("Formato della data non valido: " + body.data() + ", il formato deve essere yyyy-MM-dd!");
+        }
+        Viaggio viaggio =  new Viaggio(body.destinazione(), dataViaggio, statoViaggio);
         return this.viaggiRepository.save(viaggio);
     }
 
@@ -45,13 +53,19 @@ public class ViaggiService {
 
     public Viaggio findByIdAndUpdate(UUID viaggioId, ViaggioDTO updateBody) {
         StatoViaggio statoViaggio;
+        LocalDate dataViaggio;
         try {
             statoViaggio = StatoViaggio.valueOf(updateBody.statoViaggio().toUpperCase());
         } catch (IllegalArgumentException e) {
             throw new BadRequestException("Stato del viaggio non valido: " + updateBody.statoViaggio() + " il valore inserito deve essere: IN_PROGRAMMA o COMPLETATO!");
         }
+        try {
+            dataViaggio = LocalDate.parse(updateBody.data());
+        } catch (DateTimeParseException e) {
+            throw new BadRequestException("Formato della data non valido: " + updateBody.data() + ", il formato deve essere yyyy-MM-dd!");
+        }
         Viaggio viaggio = findById(viaggioId);
-        viaggio.setData(updateBody.data());
+        viaggio.setData(dataViaggio);
         viaggio.setStato_viaggio(statoViaggio);
         viaggio.setDestinazione(updateBody.destinazione());
         return viaggio;
