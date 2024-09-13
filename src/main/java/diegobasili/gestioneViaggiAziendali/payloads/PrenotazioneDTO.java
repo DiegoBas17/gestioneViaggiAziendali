@@ -9,8 +9,7 @@ import java.util.UUID;
 
 public record PrenotazioneDTO(@NotNull
                               LocalDate dataRichiesta,
-                              @NotEmpty(message = "note obbligatorio!")
-                              @Size(min = 3, max = 250)
+                              @Size(min = 0, max = 250)
                               String note,
                               @NotNull
                               UUID dipendeteID,
