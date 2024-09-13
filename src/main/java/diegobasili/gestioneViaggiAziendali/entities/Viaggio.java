@@ -1,9 +1,7 @@
 package diegobasili.gestioneViaggiAziendali.entities;
 
 import diegobasili.gestioneViaggiAziendali.enums.StatoViaggio;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -22,5 +20,6 @@ public class Viaggio {
     private UUID id;
     private String destinazione;
     private LocalDate data;
+    @Enumerated(EnumType.STRING)
     private StatoViaggio stato_viaggio;
 }

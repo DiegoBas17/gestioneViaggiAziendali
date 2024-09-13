@@ -24,7 +24,7 @@ public class Prenotazione {
     private LocalDate data_richiesta;
     private String note;
     @ManyToOne
-    private List<Dipendente> dipendenti;
+    private Dipendente dipendente;
     @ManyToOne
-    private List<Viaggio> viaggi;
+    private Viaggio viaggio;
 }
